@@ -32,8 +32,9 @@ class TasksController < ApplicationController
   # PATCH/PUT /tasks/1
   # PATCH/PUT /tasks/1.json
   def update
-    check_if_admin unless task_params[user_id: @person.id] && (task_params[state: 'in progress'] || task_params[state: 'done'])
-    decrease_reward if task_params[state: 'failed'] && @task.state != 'failed'
+    check_if_admin unless task_params[:user_id] == @person.id && (task_params[:state] == 'in progress' || task_params[:state] == 'done')
+    decrease_reward if task_params[:state] == 'failed' && @task.state != 'failed'
+    send_reward if task_params[:state] == 'verified' && @task.state != 'verified'
     if @task.update(task_params)
       render :show, status: :ok, location: @task
     else
@@ -60,5 +61,11 @@ class TasksController < ApplicationController
 
     def decrease_reward
       @task.reward -= 1 if @task.reward > 1
+    end
+
+    def send_reward
+      u = @task.user
+      u.account += @task.reward
+      u.save
     end
 end

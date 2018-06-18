@@ -22,5 +22,8 @@ How to run: clone this repo, bundle, run `rake db:migrate` && `rake db:seed`, `r
 * Create new user
 `curl http://localhost:3000/users.json -X POST -d ' {"user":{"name":"Julia","password":"789"}}' -H "Content-type: application/json" -H 'Authorization: Token token=0647bef020323dcaa1f3af918a717d94'`
 
+* Update task
+`curl http://localhost:3000/tasks/1.json -X PUT -d '{"task":{"state":"verified"}}' -H "Content-type: application/json" -H 'Authorization: Token token=0647bef020323dcaa1f3af918a717d94'`
+
 * Delete task
 `curl http://localhost:3000/tasks/1.json -X DELETE -H 'Authorization: Token token=0647bef020323dcaa1f3af918a717d94'`
