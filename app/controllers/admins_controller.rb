@@ -51,8 +51,4 @@ class AdminsController < ApplicationController
     def admin_params
       params.require(:admin).permit(:name, :email, :password, :auth_token)
     end
-
-    #def check_if_admin
-    #  render json: { error: 'Access denied'}, status: 401 unless @is_admin
-    #end
 end

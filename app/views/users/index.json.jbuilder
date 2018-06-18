@@ -10,5 +10,5 @@ json.users @users do |user|
   json.in_progress tasks.keep_if{|t| t.state == 'in progress'}.size
   json.done        tasks.keep_if{|t| t.state == 'done'}.size
   json.verified    tasks.keep_if{|t| t.state == 'verified'}.size
-  json.declined    tasks.keep_if{|t| t.state == 'declined'}.size
+  json.failed      tasks.keep_if{|t| t.state == 'failed'}.size
 end

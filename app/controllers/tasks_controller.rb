@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :update, :destroy]
-  before_action :check_if_admin, only: [:create, :update, :destroy]
+  before_action :check_if_admin, only: [:create, :destroy]
 
   # GET /tasks
   # GET /tasks.json
@@ -32,6 +32,8 @@ class TasksController < ApplicationController
   # PATCH/PUT /tasks/1
   # PATCH/PUT /tasks/1.json
   def update
+    check_if_admin unless task_params[user_id: @person.id] && (task_params[state: 'in progress'] || task_params[state: 'done'])
+    decrease_reward if task_params[state: 'failed'] && @task.state != 'failed'
     if @task.update(task_params)
       render :show, status: :ok, location: @task
     else
@@ -54,5 +56,9 @@ class TasksController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def task_params
       params.require(:task).permit(:description, :reward, :state, :user_id)
+    end
+
+    def decrease_reward
+      @task.reward -= 1 if @task.reward > 1
     end
 end

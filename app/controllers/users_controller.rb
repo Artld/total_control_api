@@ -11,7 +11,7 @@ class UsersController < ApplicationController
   # GET /users/1
   # GET /users/1.json
   def show
-    render json: { error: 'Access denied'}, status: 401 unless @is_admin || @user == @person
+    check_if_admin unless @user == @person
   end
 
   # POST /users
