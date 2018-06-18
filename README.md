@@ -1,9 +1,19 @@
 # README
 
-How to run: clone this repo, bundle, run rake db:migrate && rake db:seed, rails s
+How to run: clone this repo, bundle, run `rake db:migrate` && `rake db:seed`, `rails s`
 
-Access json api this way:
+1. Encode your name (email for admin) and password with BASE64 like that:
 
-curl http://localhost:3000/users.json -H 'Authorization: Token token=75d103c48336c63d629c3329ac49f79a'
+`Base64.encode64("harris@example.com:strongPassword1")`
 
-Application is under active development. Don't touch unless you wish to have your computer broken!
+` => "aGFycmlzQGV4YW1wbGUuY29tOnN0cm9uZ1Bhc3N3b3JkMQ==\n"`
+
+2. Get token:
+
+`curl http://localhost:3000/token -H 'Authorization: Basic aGFycmlzQGV4YW1wbGUuY29tOnN0cm9uZ1Bhc3N3b3JkMQ==\n'`
+
+` => {"token":"0647bef020323dcaa1f3af918a717d94"}`
+
+3. Use this token to access json api:
+
+`curl http://localhost:3000/users.json -H 'Authorization: Token token=0647bef020323dcaa1f3af918a717d94'`
