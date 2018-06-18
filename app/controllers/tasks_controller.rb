@@ -5,7 +5,7 @@ class TasksController < ApplicationController
   # GET /tasks
   # GET /tasks.json
   def index
-    @tasks = @is_admin ? Task.all : Task.where(user_id: @person.id) + Task.where(state: 'open')
+    @tasks = @is_admin ? Task.all : Task.where(user_id: @person.id) + Task.where(state: 'open', user_id: nil)
   end
 
   # GET /tasks/1
@@ -32,8 +32,15 @@ class TasksController < ApplicationController
   def update
     state = task_params[:state]
     prev_state = @task.state
-    # Restrict access
-    check_if_admin unless (task_params[:user_id] == @person.id || @task.user_id == @person.id) && (state == 'in progress' || state == 'done')
+
+    # Restrict access for non-admins unless
+    # new state is 'in progress' or 'done' or missed in params
+    check_if_admin unless ['in progress', 'done', nil].include?(state) and (
+    # task belongs to user
+    @task.user_id == @person.id or
+    # user assigns task for himself AND task has not owner AND task is open
+    task_params[:user_id] == @person.id && @task.user_id.nil? && prev_state == 'open')
+
     decrease_reward if state == 'failed' && prev_state != 'failed'
     if @task.update(task_params)
       send_reward if state == 'verified' && prev_state != 'verified'
@@ -57,7 +64,11 @@ class TasksController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def task_params
-      params.require(:task).permit(:description, :reward, :state, :user_id)
+      if @is_admin
+        params.require(:task).permit(:description, :reward, :state, :user_id)
+      else
+        params.require(:task).permit(:state, :user_id)
+      end
     end
 
     def decrease_reward
