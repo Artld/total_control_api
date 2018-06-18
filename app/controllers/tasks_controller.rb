@@ -5,16 +5,14 @@ class TasksController < ApplicationController
   # GET /tasks
   # GET /tasks.json
   def index
-    if @is_admin
-      @tasks = Task.all
-    else
-      @tasks = Task.where(user_id: @person.id) + Task.where(state: 'open')
-    end
+    @tasks = @is_admin ? Task.all : Task.where(user_id: @person.id) + Task.where(state: 'open')
   end
 
   # GET /tasks/1
   # GET /tasks/1.json
   def show
+    # Restrict access
+    check_if_admin unless @task.user_id == @person.id || @task.state == 'open'
   end
 
   # POST /tasks
@@ -32,10 +30,13 @@ class TasksController < ApplicationController
   # PATCH/PUT /tasks/1
   # PATCH/PUT /tasks/1.json
   def update
-    check_if_admin unless task_params[:user_id] == @person.id && (task_params[:state] == 'in progress' || task_params[:state] == 'done')
-    decrease_reward if task_params[:state] == 'failed' && @task.state != 'failed'
-    send_reward if task_params[:state] == 'verified' && @task.state != 'verified'
+    state = task_params[:state]
+    prev_state = @task.state
+    # Restrict access
+    check_if_admin unless (task_params[:user_id] == @person.id || @task.user_id == @person.id) && (state == 'in progress' || state == 'done')
+    decrease_reward if state == 'failed' && prev_state != 'failed'
     if @task.update(task_params)
+      send_reward if state == 'verified' && prev_state != 'verified'
       render :show, status: :ok, location: @task
     else
       render json: @task.errors, status: :unprocessable_entity
