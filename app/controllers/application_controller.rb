@@ -6,7 +6,7 @@ class ApplicationController < ActionController::API
 
   def token
     authenticate_with_http_basic do |string, password|
-      person = User.find_by(name: string) | Admin.find_by(email: string)
+      person = User.find_by(name: string) || Admin.find_by(email: string)
       if person && person.password == password
         render json: { token: person.auth_token }
       else
@@ -18,7 +18,7 @@ class ApplicationController < ActionController::API
   private
 
   def authenticate_user_from_token
-    unless authenticate_with_http_token { |token, options| User.find_by(auth_token: token) | Admin.find_by(auth_token: token) }
+    unless authenticate_with_http_token { |token, options| @person = User.find_by(auth_token: token) || Admin.find_by(auth_token: token) }
       render json: { error: 'Bad Token'}, status: 401
     end
   end

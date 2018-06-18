@@ -1,24 +1,9 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+How to run: clone this repo, bundle, run rake db:migrate && rake db:seed, rails s
 
-Things you may want to cover:
+Access json api this way:
 
-* Ruby version
+curl http://localhost:3000/users.json -H 'Authorization: Token token=75d103c48336c63d629c3329ac49f79a'
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Application is under active development. Don't touch unless you wish to have your computer broken!
