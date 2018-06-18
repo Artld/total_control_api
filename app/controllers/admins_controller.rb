@@ -1,5 +1,6 @@
 class AdminsController < ApplicationController
   before_action :set_admin, only: [:show, :update, :destroy]
+  before_action :check_if_admin
 
   # GET /admins
   # GET /admins.json
@@ -50,4 +51,8 @@ class AdminsController < ApplicationController
     def admin_params
       params.require(:admin).permit(:name, :email, :password, :auth_token)
     end
+
+    #def check_if_admin
+    #  render json: { error: 'Access denied'}, status: 401 unless @is_admin
+    #end
 end

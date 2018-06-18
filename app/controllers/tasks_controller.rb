@@ -1,10 +1,15 @@
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :update, :destroy]
+  before_action :check_if_admin, only: [:create, :update, :destroy]
 
   # GET /tasks
   # GET /tasks.json
   def index
-    @tasks = Task.all
+    if @is_admin
+      @tasks = Task.all
+    else
+      @tasks = Task.where(user_id: @person.id) + Task.where(state: 'open')
+    end
   end
 
   # GET /tasks/1

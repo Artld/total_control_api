@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :update, :destroy]
-  before_action :check_if_admin
+  before_action :check_if_admin, only: [:index, :create, :update, :destroy]
 
   # GET /users
   # GET /users.json
@@ -11,6 +11,7 @@ class UsersController < ApplicationController
   # GET /users/1
   # GET /users/1.json
   def show
+    render json: { error: 'Access denied'}, status: 401 unless @is_admin || @user == @person
   end
 
   # POST /users
@@ -50,13 +51,5 @@ class UsersController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
       params.require(:user).permit(:name, :password, :auth_token)
-    end
-
-    def check_if_admin
-      if @person.class != Admin
-        if @user.nil? | @user != @person
-          render json: { error: 'Access denied'}, status: 401
-        end
-      end
     end
 end
