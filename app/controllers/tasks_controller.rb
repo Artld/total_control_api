@@ -5,7 +5,18 @@ class TasksController < ApplicationController
   # GET /tasks
   # GET /tasks.json
   def index
-    @tasks = @is_admin ? Task.all : Task.where(user_id: @person.id) + Task.where(state: 'open', user_id: nil)
+    @tasks =
+    if @is_admin
+      if id = params[:filter_by_user_id]
+        Task.where(user_id: id)
+      elsif state = params[:filter_by_state]
+        Task.where(state: state)
+      else
+        Task.all
+      end
+    else
+      Task.where(user_id: @person.id) + Task.where(state: 'open', user_id: nil)
+    end
   end
 
   # GET /tasks/1
