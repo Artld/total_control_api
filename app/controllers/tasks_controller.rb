@@ -52,8 +52,8 @@ class TasksController < ApplicationController
     # user assigns task for himself AND task has not owner AND task is open
     task_params[:user_id] == @person.id && @task.user_id.nil? && prev_state == 'open')
 
-    decrease_reward if state == 'failed' && prev_state != 'failed'
     if @task.update(task_params)
+      @task.decrease_reward if state == 'failed' && prev_state != 'failed'
       send_reward if state == 'verified' && prev_state != 'verified'
       render :show, status: :ok, location: @task
     else
@@ -82,13 +82,7 @@ class TasksController < ApplicationController
       end
     end
 
-    def decrease_reward
-      @task.reward -= 1 if @task.reward > 1
-    end
-
     def send_reward
-      u = @task.user
-      u.account += @task.reward
-      u.save
+      @task.user.get_reward @task.reward
     end
 end
